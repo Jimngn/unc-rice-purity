@@ -6,113 +6,121 @@
  */
 
 const questions = [
-    // Academics
-    "Have you ever skipped a class to sleep in?",
-    "Have you ever attended class hungover?",
-    "Have you ever pulled an all-nighter to study for an exam?",
-    "Have you ever fallen asleep during a lecture?",
-    "Have you ever asked ChatGPT to write a paper for you?",
-    "Have you ever had a class in the Pit?",
-    "Have you ever rushed Franklin Street after a Duke basketball game?",
-    "Have you ever witnessed the UNC-Duke rivalry in person?",
-    "Have you ever had a class with more than 300 students?",
-    "Have you ever changed your major?",
-    
-    // Campus Life
-    "Have you ever lived in a dorm?",
-    "Have you ever gotten lost on campus?",
-    "Have you ever studied in Davis Library past midnight?",
-    "Have you ever been to the Silent Sam memorial site?",
-    "Have you ever taken the P2P bus after 2 AM?",
-    "Have you ever had a meal at Lenoir Dining Hall?",
-    "Have you ever taken a nap on the quad?",
-    "Have you ever been caught in a torrential downpour without an umbrella on campus?",
-    "Have you ever used the UNC tunnel system?",
-    "Have you ever attended a UNC basketball game?",
-    
-    // Franklin Street & Chapel Hill
-    "Have you ever participated in Halloween on Franklin Street?",
-    "Have you ever eaten at Top of the Hill?",
-    "Have you ever ordered Time-Out chicken at 2 AM?",
-    "Have you ever eaten at Sup Dogs?",
-    "Have you ever ordered a blue cup at He's Not Here?",
-    "Have you ever had to wait more than 30 minutes for a table at Sunrise Biscuit Kitchen?",
-    "Have you ever eaten at Med Deli?",
-    "Have you ever bar-hopped on Franklin Street?",
-    "Have you ever had IP3's pizza after midnight?",
-    "Have you ever walked from South Campus to Franklin Street?",
-    
-    // Traditions & Spirit
-    "Have you ever rubbed the Davie Poplar tree for good luck?",
-    "Have you ever taken a sip from the Old Well on the first day of classes?",
-    "Have you ever sung the alma mater at a sporting event?",
-    "Have you ever worn Carolina Blue to a UNC game?",
-    "Have you ever painted your face for a sporting event?",
-    "Have you ever participated in Dance Marathon?",
-    "Have you ever attended a UNC football game?",
-    "Have you ever participated in a UNC flash mob?",
-    "Have you ever done the Tar Heel chant?",
-    "Have you ever taken a graduation photo at the Old Well?",
-    
+    // Campus Traditions & Locations
+    "Drank from the Old Well on the first day of classes for good luck?";
+    "Stepped on the UNC seal in front of Wilson Library despite the superstition?";
+    "Climbed to the top of the Bell Tower?";
+    "Taken a photo at the Old Well in graduation regalia?";
+    "Visited the Ackland Art Museum?";
+    "Attended a performance at Memorial Hall?";
+    "Studied in the Arboretum?";
+    "Had a picnic in the Coker Arboretum?";
+    "Studied at Davis Library until closing time?";
+    "Completed an all-nighter at the Undergraduate Library (UL)?";
+    "Watched the sunset from the steps of Wilson Library?";
+    "Visited the Morehead Planetarium?";
+
+    // Sports & School Spirit
+    "Attended a UNC basketball game at the Dean Dome?";
+    "Painted your face Carolina blue for a sports event?";
+    "Rushed Franklin Street after beating Duke?";
+    "Attended a Duke vs. UNC game in person?";
+    "Taken a photo with Rameses (the mascot)?";
+    "Skipped class to watch a UNC basketball game?";
+    "Attended a UNC football game at Kenan Stadium?";
+    "Booed Duke players during a basketball game?";
+    "Worn Duke blue on campus accidentally?";
+    "Participated in the Tar Heel Marathon?";
+    "Owned five or more items of UNC merchandise?";
+    "Defended UNC during a sports scandal conversation?";
+
+    // Academic Life
+    "Changed your major at UNC?";
+    "Failed a class at UNC?";
+    "Had a class with over 300 students?";
+    "Fallen asleep during a lecture in a large auditorium?";
+    "Had a class canceled because the professor didn't show up?";
+    "Used a previous student's notes or test materials?";
+    "Used AI tools like ChatGPT to complete homework?";
+    "Been caught for academic dishonesty?";
+    "Pulled an all-nighter to finish a project or study for an exam?";
+    "Turned in an assignment at 11:59 PM?";
+    "Had to carry a group project by yourself?";
+    "Been the one who needed carrying in a group project?";
+    "Placed a review on Rate My Professor?";
+    "Skipped a whole class for the entire semester?";
+    "Attended less than 5 lectures for a course in a single term?";
+    "Completed the Carolina Campus Life Experience (CLE) requirements?";
+
+    // Campus Dining & Franklin Street
+    "Eaten at Lenoir Dining Hall?";
+    "Eaten at Chase Dining Hall?";
+    "Got sick from dining hall food?";
+    "Used your meal swipes to feed a friend?";
+    "Ordered Time-Out chicken and cheese biscuits after midnight?";
+    "Been to He's Not Here bar?";
+    "Received a 'Blue Cup' from He's Not Here?";
+    "Visited four or more restaurants on Franklin Street in one day?";
+    "Eaten at Top of Lenoir during finals week when it's particularly crowded?";
+    "Been to Med Deli on Franklin Street?";
+
+    // Residence Life
+    "Lived in South Campus dorms?";
+    "Lived in North Campus dorms?";
+    "Lived in Granville Towers?";
+    "Been written up by an RA?";
+    "Locked yourself out of your dorm room?";
+    "Gotten noise complaints in university housing?";
+    "Had roommate drama serious enough to involve housing staff?";
+    "Snuck a pet into dorms against housing policy?";
+    "Hosted a party in your dorm that got shut down?";
+    "Kicked your roommate out for a hook-up?";
+    "Been kicked out by your roommate for their hook-up?";
+    "Lived off-campus in Chapel Hill?";
+
     // Social Life
-    "Have you ever joined a fraternity or sorority?",
-    "Have you ever attended a fraternity/sorority party?",
-    "Have you ever dated someone from Duke?",
-    "Have you ever been rejected from a party?",
-    "Have you ever tailgated before a game?",
-    "Have you ever attended Jubilee?",
-    "Have you ever been to a party at Shortbread Lofts?",
-    "Have you ever been to a club meeting just for the free food?",
-    "Have you ever had a crush on a TA?",
-    "Have you ever made friends with someone from your dorm floor?",
-    
-    // Risky Behavior
-    "Have you ever been kicked out of a campus building?",
-    "Have you ever streaked across campus?",
-    "Have you ever been to a party that got shut down by the police?",
-    "Have you ever climbed the Bell Tower?",
-    "Have you ever skinny-dipped in the campus fountains?",
-    "Have you ever snuck into Kenan Stadium after hours?",
-    "Have you ever broken into the Arboretum after dark?",
-    "Have you ever used a fake ID on Franklin Street?",
-    "Have you ever been on academic probation?",
-    "Have you ever been caught by an RA for breaking dorm rules?",
-    
-    // Specific to UNC
-    "Have you ever beaten Duke in a game of pickup basketball?",
-    "Have you ever spotted Roy Williams on campus?",
-    "Have you ever participated in FDOC (First Day of Classes) celebrations?",
-    "Have you ever participated in LDOC (Last Day of Classes) celebrations?",
-    "Have you ever taken a class with a well-known professor?",
-    "Have you ever seen the campus ghost, Gimghoul?",
-    "Have you ever visited the Gimghoul Castle?",
-    "Have you ever searched for the secret UNC societies?",
-    "Have you ever been to the Morehead Planetarium?",
-    "Have you ever participated in Holi Moli?",
-    
-    // Food & Drink
-    "Have you ever had a Carolina Brewery beer?",
-    "Have you ever tried every food option at the Bottom of Lenoir?",
-    "Have you ever had coffee at the Student Stores Starbucks?",
-    "Have you ever eaten at Ram's Head Dining Hall?",
-    "Have you ever used dining dollars to buy snacks before they expired?",
-    "Have you ever ordered food delivery to the library?",
-    "Have you ever tried the ice cream at Maple View Farm?",
-    "Have you ever had a cookie from Insomnia Cookies after midnight?",
-    "Have you ever been to Al's Burger Shack?",
-    "Have you ever had a meal at Sutton's Drug Store?",
-    
-    // Miscellaneous
-    "Have you ever attended a protest on campus?",
-    "Have you ever voted in a student government election?",
-    "Have you ever cried over a midterm?",
-    "Have you ever been on campus during a snowstorm?",
-    "Have you ever used the campus mental health services?",
-    "Have you ever had a class canceled due to a sports championship?",
-    "Have you ever worked an on-campus job?",
-    "Have you ever witnessed a campus controversy?",
-    "Have you ever attended a UNC concert?",
-    "Have you ever been featured in the Daily Tar Heel?"
+    "Attended Fall Fest?";
+    "Participated in Dance Marathon?";
+    "Attended LDOC (Last Day of Classes) celebrations?";
+    "Joined a fraternity or sorority?";
+    "Attended a fraternity or sorority party?";
+    "Been to three or more parties in one night?";
+    "Joined a UNC club or organization?";
+    "Been involved with cultural organizations on campus?";
+    "Participated in a Black Student Movement (BSM) event?";
+    "Attended a student protest or demonstration on campus?";
+    "Been in a picture on the official UNC social media?";
+    "Met the UNC Chancellor in person?";
+
+    // Romance & Personal Life
+    "Had a romantic relationship with another UNC student?";
+    "Kissed someone in the Arboretum?";
+    "Hooked up with someone in a study room?";
+    "Had a one-night stand with a fellow UNC student?";
+    "Hooked up with someone from a rival school (Duke, NC State)?";
+    "Had a romantic encounter in a UNC dorm room?";
+    "Felt a spark with a teaching assistant?";
+    "Had a crush on a professor?";
+    "Used a dating app while on campus?";
+    "Broken up or been broken up with on campus?";
+
+    // Breaking the Rules
+    "Used a fake ID at a Chapel Hill bar?";
+    "Snuck into Kenan Stadium after hours?";
+    "Broken into a campus pool after hours?";
+    "Climbed onto a campus roof?";
+    "Explored the underground tunnels connecting buildings on campus?";
+    "Stolen something from campus (signs, banners, etc.)?";
+    "Been questioned by campus police?";
+    "Received a parking ticket on campus?";
+    "Been towed from a campus parking spot?";
+    "Been sent to the Dean of Students for disciplinary reasons?";
+    "Used drugs in your dorm room?";
+    "Drank alcohol on campus against policy?";
+    "Damaged property during Franklin Street celebrations?";
+    "Been to the UNC Hospital for an alcohol-related incident?";
+    "Been arrested in Chapel Hill?";
+    "Been placed on academic probation?";
 ];
 
 // Score ranges and descriptions for interpreting results
