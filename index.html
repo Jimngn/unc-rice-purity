@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNC Chapel Hill Purity Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="unc-logo.png" alt="UNC Chapel Hill Logo">
+        </div>
+        <h1>UNC Chapel Hill Purity Test</h1>
+    </header>
+    
+    <main>
+        <div class="container">
+            <div class="intro">
+                <p><em>The UNC Purity Test serves as a way for Tar Heels to bond and track their experiences throughout their time at The University of North Carolina at Chapel Hill. It's a voluntary opportunity for students to reflect on their unique university journey.</em></p>
+                <p class="warning"><strong>Caution: This is not a bucket list. You are beyond cooked if you complete all the items on this list.</strong></p>
+                <p class="instructions">Click on every item you have done. Your purity score will be calculated at the end.</p>
+            </div>
+
+            <form id="purityForm">
+                <ol id="questionsContainer">
+                    <!-- Questions will be added dynamically by JavaScript -->
+                </ol>
+
+                <div class="form-footer">
+                    <button type="submit" id="calculateButton" class="button">Calculate My Score</button>
+                    <button type="reset" id="resetButton" class="button">Reset</button>
+                </div>
+            </form>
+
+            <div id="results" class="results" style="display: none;">
+                <h2>Your UNC Purity Score: <span id="purityScore">--</span>%</h2>
+                <p id="scoreDescription"></p>
+                
+                <div class="stats-section">
+                    <button id="viewStatsButton" class="button">View Statistics</button>
+                    <div id="statsContainer" class="stats-container" style="display: none;">
+                        <h3>Statistics - Most Common Experiences:</h3>
+                        <div id="statsContent">
+                            <!-- Statistics will be added dynamically by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>The UNC Chapel Hill Purity Test is for entertainment purposes only. All responses are anonymous.</p>
+        <p>Inspired by the <a href="https://ricepuritytest.com/" target="_blank">Rice Purity Test</a>. Not officially affiliated with UNC Chapel Hill.</p>
+    </footer>
+
+    <!-- Supabase Client - Properly initialized for browser -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Initialize Supabase client with direct API key (safe to expose this anon key)
+        const supabaseUrl = 'https://anvrfqljixbjakzwvbpk.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFudnJmcWxqaXhiamFrend2YnBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MTk3MDksImV4cCI6MjA1Nzk5NTcwOX0.jfJY1Q5SYNr8cRQWr_q88zAq-TQmgvlsfsft36shyns';
+        
+        // Create the Supabase client - using the correct syntax for browser environments
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+        
+        // Make it globally available
+        window.supabaseClient = supabaseClient;
+        
+        console.log('Supabase initialized');
+    </script>
+
+    <script src="questions.js"></script>
+    <script src="app.js"></script>
+</body>
+</html> 

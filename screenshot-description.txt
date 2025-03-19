@@ -1,0 +1,14 @@
+## Screenshot Description
+
+A screenshot of the UNC Chapel Hill Purity Test would show:
+
+1. The header with "UNC Chapel Hill Purity Test" title and simple logo in Carolina Blue
+2. An instruction text explaining the purpose of the test
+3. A numbered list of 100 checkboxes with UNC-specific questions like:
+   - "Have you ever attended a UNC basketball game?"
+   - "Have you ever rushed Franklin Street after a Duke basketball game?"
+   - "Have you ever taken a sip from the Old Well on the first day of classes?"
+4. A "Calculate My Score" button at the bottom
+5. Below that (if the test has been submitted), a results section showing the user's purity score and description
+
+The overall look resembles the classic, simple styling of the Rice Purity Test with UNC's Carolina Blue color accents. 
