@@ -74,7 +74,7 @@ main {
 
 /* Questions */
 ol {
-    counter-reset: item;
+    counter-reset: none;
     list-style-type: decimal;
     padding-left: 2rem;
     margin-bottom: 2rem;
@@ -83,9 +83,14 @@ ol {
     margin-right: auto;
 }
 
-.question {
+li.question {
+    display: list-item !important;
     margin-bottom: 0.5rem;
     padding: 0.3rem 0;
+    position: relative;
+}
+
+.question {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -180,7 +185,7 @@ ol {
     height: 60px;
     background-color: #f5f5f5;
     position: relative;
-    margin: 20px 0;
+    margin: 40px 0 20px 0;
     border-radius: 4px;
 }
 
@@ -211,6 +216,10 @@ ol {
     border-radius: 4px;
     font-size: 0.9rem;
     white-space: nowrap;
+}
+
+.percentile-description {
+    margin-bottom: 15px;
 }
 
 .percentile-labels {
