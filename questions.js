@@ -78,7 +78,6 @@ const questions = [
     "Called NC State students 'farmers without land'?",
     "Chanted 'Don't give a damn about Duke University'?",
     "Went to Crumbl Cookies at 2 AM to use the freethrow code?",
-    "Said 'Chew tobacco, chew tobacco, chew tobacco, spit. If you ain't a Tar Heel, you ain't shit'?",
 
     // Relationships & Personal
     "Held hands romantically on campus?",
