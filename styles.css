@@ -170,6 +170,15 @@ li.question {
     color: var(--primary-color);
 }
 
+.percentage-explanation {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #f8f8f8;
+    border-left: 3px solid var(--primary-color);
+    font-size: 0.9rem;
+    text-align: left;
+}
+
 .stats-section {
     margin-top: 1.5rem;
 }

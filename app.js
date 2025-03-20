@@ -270,6 +270,12 @@ async function calculateResults(e) {
     purityScore.textContent = score;
     scoreDescription.innerHTML = getScoreDescription(score);
     
+    // Add explanation about question percentages
+    const percentageExplanation = document.createElement('p');
+    percentageExplanation.className = 'percentage-explanation';
+    percentageExplanation.innerHTML = '<strong>Note:</strong> The percentages next to each question show how many UNC students have done that activity.';
+    scoreDescription.insertAdjacentElement('afterend', percentageExplanation);
+    
     // Update percentages for all questions
     questionsContainer.classList.add('show-percentages');
     for (let i = 0; i < questions.length; i++) {
@@ -355,7 +361,8 @@ async function loadSupabaseStats(userAnsweredQuestions, score) {
         
         // Calculate percentile
         const scores = allScores.map(item => item.score);
-        const scoresBelow = scores.filter(s => s < score).length;
+        // Reverse the percentile calculation logic - higher scores are better (more pure)
+        const scoresBelow = scores.filter(s => s > score).length;
         const percentile = Math.round((scoresBelow / scores.length) * 100);
         
         // Create percentile chart
@@ -374,7 +381,7 @@ async function loadSupabaseStats(userAnsweredQuestions, score) {
         // Add description
         const percentileDescription = document.createElement('p');
         percentileDescription.className = 'percentile-description';
-        percentileDescription.innerHTML = `Your score is higher than <strong>${percentile}%</strong> of all UNC students who have taken this test.`;
+        percentileDescription.innerHTML = `Your score is higher than <strong>${percentile}%</strong> of all UNC students who have taken this test. The higher the percentage, the more "pure" you are compared to others.`;
         chartContainer.appendChild(percentileDescription);
         
         // Create the chart
@@ -405,10 +412,10 @@ async function loadSupabaseStats(userAnsweredQuestions, score) {
         labels.className = 'percentile-labels';
         
         const leftLabel = document.createElement('span');
-        leftLabel.textContent = 'Less Pure';
+        leftLabel.textContent = 'More Pure';
         
         const rightLabel = document.createElement('span');
-        rightLabel.textContent = 'More Pure';
+        rightLabel.textContent = 'Less Pure';
         
         labels.appendChild(leftLabel);
         labels.appendChild(rightLabel);
