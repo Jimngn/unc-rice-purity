@@ -46,8 +46,8 @@ const questions = [
     "Complained about the lack of parking on campus?",
     "Got a parking ticket?",
     "Got more than 5 parking tickets?",
-    "Posted on the UNC subreddit?",
-    "Been in a picture on the official UNC social media?",
+    "Posted on the UNC subreddit or Yik Yak?",
+    "Been in a picture on the official UNC social media or Barstool?",
     "Worked out at the campus gym?",
     "Participated in intramural sports?",
     "Attended a UNC sporting event?",
@@ -85,7 +85,7 @@ const questions = [
     "Hooked up in a campus building?",
     "Hooked up in a Library?",
     "Hooked up in the Arboretum?",
-    "Hooked up using Yik Yak (UNC After Dark)?",
+    "Hooked up using Yik Yak (After Dark)?",
     "Hooked up with a frat brother to avoid getting kicked out of the party?",
     "Been in a relationship with another UNC student?",
     "Been in a relationship with a TA?",
@@ -121,7 +121,7 @@ const questions = [
 const scoreRanges = [
     { min: 0, max: 20, title: "Carolina Legend", description: "Your liver deserves a separate diploma. You've experienced everything Chapel Hill has to offer and might have invented a few new traditions along the way." },
     { min: 21, max: 40, title: "Ram Rampager", description: "You've mastered the art of balancing hangovers with homework. Your parents would be equally proud and horrified." },
-    { min: 41, max: 60, title: "Blue Cup Collector", description: "You've dabbled in the Carolina experience but still have a few unexplored corners of campus. Your liver functions at approximately 75% capacity." },
+    { min: 41, max: 60, title: "Red Cup Collector", description: "You've dabbled in the Carolina experience but still have a few unexplored corners of campus. Your liver functions at approximately 75% capacity." },
     { min: 61, max: 80, title: "Library Dweller", description: "You've heard rumors of this thing called 'fun' but can't find it in the course catalog. Your GPA is inversely proportional to your social life." },
     { min: 81, max: 100, title: "Franklin Street Virgin", description: "You think Top of the Hill is just a geographical location. Your dorm room has seen more of you than the entire campus combined." }
 ];

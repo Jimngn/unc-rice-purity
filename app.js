@@ -192,13 +192,123 @@ async function calculateResults(e) {
         responses[index] = true;
     });
     
-    // Update local statistics for UI only (will not be used for persistence)
+    // Update local statistics for UI only
     const userAnsweredQuestions = updateStatistics();
     
     // Calculate score
     const score = calculateScore();
     
-    // Store data in Supabase
+    try {
+        // STAGE 1: QUICKLY LOAD EXISTING STATS AND DISPLAY RESULTS
+        
+        // Show basic results immediately
+        resultsSection.style.display = 'block';
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
+        purityScore.textContent = score;
+        
+        // Load existing statistics from Supabase
+        console.log('Loading statistics from Supabase...');
+        
+        // Get total number of submissions
+        const { data: scoresData, error: scoresError, count: totalScores } = await window.supabaseClient
+            .from('scores')
+            .select('*', { count: 'exact', head: true });
+            
+        if (scoresError) {
+            console.error('Error loading scores count:', scoresError);
+            throw scoresError;
+        }
+        
+        // Get all scores to calculate percentile
+        const { data: allScores, error: allScoresError } = await window.supabaseClient
+            .from('scores')
+            .select('score');
+            
+        if (allScoresError) {
+            console.error('Error loading all scores:', allScoresError);
+            throw allScoresError;
+        }
+        
+        // Calculate percentile based on EXISTING data (before this user's submission)
+        const scores = allScores.map(item => item.score);
+        const scoresBelow = scores.filter(s => s < score).length;
+        const percentile = Math.round((scoresBelow / scores.length) * 100);
+        
+        // Set the score description based on percentile
+        scoreDescription.innerHTML = getScoreDescriptionByPercentile(percentile);
+        
+        // Add explanation about question percentages
+        const percentageExplanation = document.createElement('p');
+        percentageExplanation.className = 'percentage-explanation';
+        percentageExplanation.innerHTML = '<strong>Note:</strong> The percentages next to each question show how many UNC students have done that activity.';
+        scoreDescription.insertAdjacentElement('afterend', percentageExplanation);
+        
+        // Get existing question responses
+        const { data: allResponses, error: responsesError } = await window.supabaseClient
+            .from('question_responses')
+            .select('*');
+            
+        if (responsesError) {
+            console.error('Error loading responses:', responsesError);
+            throw responsesError;
+        }
+        
+        // Create a map of question_id to count for easy lookup
+        const questionCountMap = {};
+        if (allResponses && allResponses.length > 0) {
+            allResponses.forEach(response => {
+                questionCountMap[response.question_id] = response.count;
+            });
+        }
+        
+        // Update percentages for all questions using existing data
+        questionsContainer.classList.add('show-percentages');
+        for (let i = 0; i < questions.length; i++) {
+            const percentageElement = document.getElementById(`percentage-${i}`);
+            if (percentageElement) {
+                // Calculate percentage based on existing data
+                const count = questionCountMap[i] || 0;
+                const percentage = totalScores > 0 ? Math.round((count / totalScores) * 100) : 0;
+                
+                // Update the displayed percentage
+                percentageElement.textContent = `${percentage}%`;
+                
+                // Also update our local statistics object for consistency
+                statistics[i] = percentage;
+            }
+        }
+        
+        // Load and display statistics chart
+        await loadSupabaseStats(userAnsweredQuestions, score);
+        
+        // Hide loading indicator and re-enable buttons
+        loadingContainer.style.display = 'none';
+        calculateButton.disabled = false;
+        resetButton.disabled = false;
+        
+        // STAGE 2: UPDATE DATABASE WITH USER'S RESPONSES IN THE BACKGROUND
+        // This happens after results are already displayed to the user
+        
+        // Use a separate async function to avoid blocking UI
+        updateDatabaseInBackground(score, userAnsweredQuestions)
+            .then(() => console.log('Background database update completed'))
+            .catch(error => console.error('Background update failed:', error));
+            
+    } catch (error) {
+        console.error('Error loading statistics:', error);
+        
+        // Hide loading indicator and re-enable buttons
+        loadingContainer.style.display = 'none';
+        calculateButton.disabled = false;
+        resetButton.disabled = false;
+        
+        // Display results using local data as fallback
+        displayResults(score);
+    }
+}
+
+// Function to update database in the background after results are displayed
+async function updateDatabaseInBackground(score, userAnsweredQuestions) {
     try {
         console.log('Saving data to Supabase...');
         
@@ -218,7 +328,7 @@ async function calculateResults(e) {
         
         console.log('Score saved successfully:', scoreData);
         
-        // 2. Update question response stats - one by one to avoid errors
+        // 2. Update question response stats - one by one
         for (const index of userAnsweredQuestions) {
             try {
                 // First check if this question already exists
@@ -271,105 +381,10 @@ async function calculateResults(e) {
             }
         }
         
-        // 3. Get total number of test submissions (scores count)
-        const { data: scoresData, error: scoresError, count: totalScores } = await window.supabaseClient
-            .from('scores')
-            .select('*', { count: 'exact', head: true });
-            
-        if (scoresError) {
-            console.error('Error loading scores count:', scoresError);
-            throw scoresError;
-        }
-        
-        // 4. Get all question responses to calculate accurate percentages
-        const { data: allResponses, error: responsesError } = await window.supabaseClient
-            .from('question_responses')
-            .select('*');
-            
-        if (responsesError) {
-            console.error('Error loading responses:', responsesError);
-            throw responsesError;
-        }
-        
-        console.log('All data saved to Supabase successfully');
-        
-        // Show basic results immediately
-        resultsSection.style.display = 'block';
-        resultsSection.scrollIntoView({ behavior: 'smooth' });
-        purityScore.textContent = score;
-        
-        // Get all scores to calculate percentile
-        const { data: allScores, error: allScoresError } = await window.supabaseClient
-            .from('scores')
-            .select('score');
-            
-        if (allScoresError) {
-            console.error('Error loading all scores:', allScoresError);
-            throw allScoresError;
-        }
-        
-        // Calculate percentile
-        const scores = allScores.map(item => item.score);
-        // Higher purity score (more no answers) means more pure
-        // So we want to count scores LOWER than the current score
-        const scoresBelow = scores.filter(s => s < score).length;
-        const percentile = Math.round((scoresBelow / scores.length) * 100);
-        
-        // We'll set the score description based on percentile
-        scoreDescription.innerHTML = getScoreDescriptionByPercentile(percentile);
-        
-        // Add explanation about question percentages (only once)
-        const percentageExplanation = document.createElement('p');
-        percentageExplanation.className = 'percentage-explanation';
-        percentageExplanation.innerHTML = '<strong>Note:</strong> The percentages next to each question show how many UNC students have done that activity.';
-        scoreDescription.insertAdjacentElement('afterend', percentageExplanation);
-        
-        // Create a map of question_id to count for easy lookup
-        const questionCountMap = {};
-        if (allResponses && allResponses.length > 0) {
-            allResponses.forEach(response => {
-                questionCountMap[response.question_id] = response.count;
-            });
-        }
-        
-        // Update percentages for all questions using actual database values
-        questionsContainer.classList.add('show-percentages');
-        for (let i = 0; i < questions.length; i++) {
-            const percentageElement = document.getElementById(`percentage-${i}`);
-            if (percentageElement) {
-                // Calculate percentage based on actual data from database
-                const count = questionCountMap[i] || 0;
-                const percentage = totalScores > 0 ? Math.round((count / totalScores) * 100) : 0;
-                
-                // Update the displayed percentage
-                percentageElement.textContent = `${percentage}%`;
-                
-                // Also update our local statistics object for consistency
-                statistics[i] = percentage;
-            }
-        }
-        
-        // Save updated statistics to ensure they persist
-        saveStatistics();
-        
-        // Load stats from Supabase and generate percentile chart
-        await loadSupabaseStats(userAnsweredQuestions, score);
-        
-        // Hide loading indicator and re-enable buttons
-        loadingContainer.style.display = 'none';
-        calculateButton.disabled = false;
-        resetButton.disabled = false;
-        
+        return true;
     } catch (error) {
-        console.error('Error in submission process:', error);
-        
-        // Hide loading indicator and re-enable buttons even if there's an error
-        loadingContainer.style.display = 'none';
-        calculateButton.disabled = false;
-        resetButton.disabled = false;
-        
-        // Display results when database operations fail
-        displayResults(score);
+        console.error('Error in background update:', error);
+        return false;
     }
 }
 
