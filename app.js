@@ -259,49 +259,113 @@ async function calculateResults(e) {
             }
         }
         
+        // 3. Get total number of test submissions (scores count)
+        const { data: scoresData, error: scoresError, count: totalScores } = await window.supabaseClient
+            .from('scores')
+            .select('*', { count: 'exact', head: true });
+            
+        if (scoresError) {
+            console.error('Error loading scores count:', scoresError);
+            throw scoresError;
+        }
+        
+        // 4. Get all question responses to calculate accurate percentages
+        const { data: allResponses, error: responsesError } = await window.supabaseClient
+            .from('question_responses')
+            .select('*');
+            
+        if (responsesError) {
+            console.error('Error loading responses:', responsesError);
+            throw responsesError;
+        }
+        
         console.log('All data saved to Supabase successfully');
-    } catch (error) {
-        console.error('Error saving data:', error);
-    }
-    
-    // Show results
-    resultsSection.style.display = 'block';
-    resultsSection.scrollIntoView({ behavior: 'smooth' });
-    purityScore.textContent = score;
-    scoreDescription.innerHTML = getScoreDescription(score);
-    
-    // Add explanation about question percentages
-    const percentageExplanation = document.createElement('p');
-    percentageExplanation.className = 'percentage-explanation';
-    percentageExplanation.innerHTML = '<strong>Note:</strong> The percentages next to each question show how many UNC students have done that activity.';
-    scoreDescription.insertAdjacentElement('afterend', percentageExplanation);
-    
-    // Update percentages for all questions
-    questionsContainer.classList.add('show-percentages');
-    for (let i = 0; i < questions.length; i++) {
-        const percentageElement = document.getElementById(`percentage-${i}`);
-        if (percentageElement) {
-            // For checked questions, make the percentage more realistic (20-80% range)
-            if (responses[i]) {
-                // If the user selected this question, ensure it has a meaningful percentage
-                const percentage = statistics[i] || Math.floor(Math.random() * 60) + 20; // Between 20% and 80%
+        
+        // Show results
+        resultsSection.style.display = 'block';
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
+        purityScore.textContent = score;
+        scoreDescription.innerHTML = getScoreDescription(score);
+        
+        // Add explanation about question percentages
+        const percentageExplanation = document.createElement('p');
+        percentageExplanation.className = 'percentage-explanation';
+        percentageExplanation.innerHTML = '<strong>Note:</strong> The percentages next to each question show how many UNC students have done that activity.';
+        scoreDescription.insertAdjacentElement('afterend', percentageExplanation);
+        
+        // Create a map of question_id to count for easy lookup
+        const questionCountMap = {};
+        if (allResponses && allResponses.length > 0) {
+            allResponses.forEach(response => {
+                questionCountMap[response.question_id] = response.count;
+            });
+        }
+        
+        // Update percentages for all questions using actual database values
+        questionsContainer.classList.add('show-percentages');
+        for (let i = 0; i < questions.length; i++) {
+            const percentageElement = document.getElementById(`percentage-${i}`);
+            if (percentageElement) {
+                // Calculate percentage based on actual data from database
+                const count = questionCountMap[i] || 0;
+                const percentage = totalScores > 0 ? Math.round((count / totalScores) * 100) : 0;
+                
+                // Update the displayed percentage
                 percentageElement.textContent = `${percentage}%`;
-                // Update statistics for this question if not already set
-                if (!statistics[i]) {
-                    statistics[i] = percentage;
-                }
-            } else {
-                // For questions not checked by user, show the existing percentage or a default
-                percentageElement.textContent = `${statistics[i] || Math.floor(Math.random() * 30) + 5}%`;
+                
+                // Also update our local statistics object for consistency
+                statistics[i] = percentage;
             }
         }
+        
+        // Save updated statistics to ensure they persist
+        saveStatistics();
+        
+        // Load stats from Supabase and generate percentile chart
+        await loadSupabaseStats(userAnsweredQuestions, score);
+        
+    } catch (error) {
+        console.error('Error saving or retrieving data:', error);
+        
+        // Still show results even if there was an error
+        resultsSection.style.display = 'block';
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
+        purityScore.textContent = score;
+        scoreDescription.innerHTML = getScoreDescription(score);
+        
+        // Add explanation about question percentages
+        const percentageExplanation = document.createElement('p');
+        percentageExplanation.className = 'percentage-explanation';
+        percentageExplanation.innerHTML = '<strong>Note:</strong> The percentages next to each question show how many UNC students have done that activity.';
+        scoreDescription.insertAdjacentElement('afterend', percentageExplanation);
+        
+        // Update percentages using local fallback data
+        questionsContainer.classList.add('show-percentages');
+        for (let i = 0; i < questions.length; i++) {
+            const percentageElement = document.getElementById(`percentage-${i}`);
+            if (percentageElement) {
+                // For checked questions, make the percentage more realistic (20-80% range)
+                if (responses[i]) {
+                    // If the user selected this question, ensure it has a meaningful percentage
+                    const percentage = statistics[i] || Math.floor(Math.random() * 60) + 20; // Between 20% and 80%
+                    percentageElement.textContent = `${percentage}%`;
+                    // Update statistics for this question if not already set
+                    if (!statistics[i]) {
+                        statistics[i] = percentage;
+                    }
+                } else {
+                    // For questions not checked by user, show the existing percentage or a default
+                    percentageElement.textContent = `${statistics[i] || Math.floor(Math.random() * 30) + 5}%`;
+                }
+            }
+        }
+        
+        // Save updated statistics
+        saveStatistics();
+        
+        // Load stats from Supabase and generate percentile chart
+        await loadSupabaseStats(userAnsweredQuestions, score);
     }
-    
-    // Save updated statistics to ensure they persist
-    saveStatistics();
-    
-    // Load stats from Supabase and generate percentile chart
-    await loadSupabaseStats(userAnsweredQuestions, score);
 }
 
 // Reset the form
