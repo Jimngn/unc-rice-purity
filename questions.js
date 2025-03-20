@@ -75,9 +75,9 @@ const questions = [
     "Held a leadership position in a club?",
     "Organized an event on campus?",
     "Attended a protest on campus?",
-    "Used the phrase 'What is it that binds us to this place'?",
     "Called NC State students 'farmers without land'?",
     "Chanted 'Don't give a damn about Duke University'?",
+    "Went to Crumbl Cookies at 2 AM to use the freethrow code?",
     "Said 'Chew tobacco, chew tobacco, chew tobacco, spit. If you ain't a Tar Heel, you ain't shit'?",
 
     // Relationships & Personal
@@ -105,6 +105,7 @@ const questions = [
     "Gone to class drunk/high?",
     "Had severe memory loss due to alcohol at a campus event?",
     "Passed out at a party?",
+    "Woke up in a stranger's room after a night out?",
     "Had the police called on you at a party?",
     "Run from campus police?",
     "Been questioned by campus police?",
