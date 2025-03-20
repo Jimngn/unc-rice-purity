@@ -489,10 +489,10 @@ async function loadSupabaseStats(userAnsweredQuestions, score) {
         labels.className = 'percentile-labels';
         
         const leftLabel = document.createElement('span');
-        leftLabel.textContent = 'More Pure';
+        leftLabel.textContent = 'Cooked';
         
         const rightLabel = document.createElement('span');
-        rightLabel.textContent = 'Less Pure';
+        rightLabel.textContent = 'Pure';
         
         labels.appendChild(leftLabel);
         labels.appendChild(rightLabel);
