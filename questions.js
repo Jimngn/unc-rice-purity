@@ -77,7 +77,7 @@ const questions = [
     "Organized an event on campus?",
     "Attended a protest on campus?",
     "Called NC State students 'farmers without land'?",
-    "Went to Crumbl Cookies at 2 AM to use the freethrow code?",
+    "Went to Crumbl Cookies at 2 AM to use the free throw code?",
 
     // Relationships & Personal
     "Held hands romantically on campus?",

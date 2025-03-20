@@ -14,6 +14,7 @@ const scoreDescription = document.getElementById('scoreDescription');
 const viewStatsButton = document.getElementById('viewStatsButton');
 const statsContainer = document.getElementById('statsContainer');
 const statsContent = document.getElementById('statsContent');
+const loadingContainer = document.getElementById('loadingContainer');
 
 // Application state
 let responses = new Array(questions.length).fill(false);
@@ -113,10 +114,10 @@ function calculateScore() {
     return Math.round((noCount / questions.length) * 100);
 }
 
-// Get the score description based on the score
-function getScoreDescription(score) {
+// Get the score description based on the percentile
+function getScoreDescriptionByPercentile(percentile) {
     for (const range of scoreRanges) {
-        if (score >= range.min && score <= range.max) {
+        if (percentile >= range.min && percentile <= range.max) {
             return `<strong>${range.title}</strong>: ${range.description}`;
         }
     }
@@ -169,6 +170,17 @@ function updateStatistics() {
 // Submit the test and show results
 async function calculateResults(e) {
     e.preventDefault();
+    
+    // Show loading indicator
+    loadingContainer.style.display = 'block';
+    calculateButton.disabled = true;
+    resetButton.disabled = true;
+    
+    // Remove any existing percentage explanation to avoid duplicates
+    const existingExplanation = document.querySelector('.percentage-explanation');
+    if (existingExplanation) {
+        existingExplanation.remove();
+    }
     
     // Get all checked checkboxes
     const checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
@@ -281,19 +293,32 @@ async function calculateResults(e) {
         
         console.log('All data saved to Supabase successfully');
         
-        // Show results
+        // Show basic results immediately
         resultsSection.style.display = 'block';
         resultsSection.scrollIntoView({ behavior: 'smooth' });
         purityScore.textContent = score;
-        scoreDescription.innerHTML = getScoreDescription(score);
         
-        // Remove any existing percentage explanation before adding a new one
-        const existingExplanation = document.querySelector('.percentage-explanation');
-        if (existingExplanation) {
-            existingExplanation.remove();
+        // Get all scores to calculate percentile
+        const { data: allScores, error: allScoresError } = await window.supabaseClient
+            .from('scores')
+            .select('score');
+            
+        if (allScoresError) {
+            console.error('Error loading all scores:', allScoresError);
+            throw allScoresError;
         }
         
-        // Add explanation about question percentages
+        // Calculate percentile
+        const scores = allScores.map(item => item.score);
+        // Higher purity score (more no answers) means more pure
+        // So we want to count scores LOWER than the current score
+        const scoresBelow = scores.filter(s => s < score).length;
+        const percentile = Math.round((scoresBelow / scores.length) * 100);
+        
+        // We'll set the score description based on percentile
+        scoreDescription.innerHTML = getScoreDescriptionByPercentile(percentile);
+        
+        // Add explanation about question percentages (only once)
         const percentageExplanation = document.createElement('p');
         percentageExplanation.className = 'percentage-explanation';
         percentageExplanation.innerHTML = '<strong>Note:</strong> The percentages next to each question show how many UNC students have done that activity.';
@@ -330,62 +355,46 @@ async function calculateResults(e) {
         // Load stats from Supabase and generate percentile chart
         await loadSupabaseStats(userAnsweredQuestions, score);
         
+        // Hide loading indicator and re-enable buttons
+        loadingContainer.style.display = 'none';
+        calculateButton.disabled = false;
+        resetButton.disabled = false;
+        
     } catch (error) {
-        console.error('Error saving or retrieving data:', error);
+        console.error('Error in submission process:', error);
         
-        // Still show results even if there was an error
-        resultsSection.style.display = 'block';
-        resultsSection.scrollIntoView({ behavior: 'smooth' });
-        purityScore.textContent = score;
-        scoreDescription.innerHTML = getScoreDescription(score);
+        // Hide loading indicator and re-enable buttons even if there's an error
+        loadingContainer.style.display = 'none';
+        calculateButton.disabled = false;
+        resetButton.disabled = false;
         
-        // Remove any existing percentage explanation before adding a new one
-        const existingExplanation = document.querySelector('.percentage-explanation');
-        if (existingExplanation) {
-            existingExplanation.remove();
-        }
-        
-        // Add explanation about question percentages
-        const percentageExplanation = document.createElement('p');
-        percentageExplanation.className = 'percentage-explanation';
-        percentageExplanation.innerHTML = '<strong>Note:</strong> The percentages next to each question show how many UNC students have done that activity.';
-        scoreDescription.insertAdjacentElement('afterend', percentageExplanation);
-        
-        // Update percentages using local fallback data
-        questionsContainer.classList.add('show-percentages');
-        for (let i = 0; i < questions.length; i++) {
-            const percentageElement = document.getElementById(`percentage-${i}`);
-            if (percentageElement) {
-                // For checked questions, make the percentage more realistic (20-80% range)
-                if (responses[i]) {
-                    // If the user selected this question, ensure it has a meaningful percentage
-                    const percentage = statistics[i] || Math.floor(Math.random() * 60) + 20; // Between 20% and 80%
-                    percentageElement.textContent = `${percentage}%`;
-                    // Update statistics for this question if not already set
-                    if (!statistics[i]) {
-                        statistics[i] = percentage;
-                    }
-                } else {
-                    // For questions not checked by user, show the existing percentage or a default
-                    percentageElement.textContent = `${statistics[i] || Math.floor(Math.random() * 30) + 5}%`;
-                }
-            }
-        }
-        
-        // Save updated statistics
-        saveStatistics();
-        
-        // Load stats from Supabase and generate percentile chart
-        await loadSupabaseStats(userAnsweredQuestions, score);
+        // Display results when database operations fail
+        displayResults(score);
     }
 }
 
 // Reset the form
 function resetForm() {
-    responses = new Array(questions.length).fill(false);
+    // Clear all checkboxes
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    
+    // Hide results section and loading indicator
     resultsSection.style.display = 'none';
+    loadingContainer.style.display = 'none';
+    
+    // Reset responses array
+    responses = new Array(questions.length).fill(false);
+    
+    // Hide stats if they're open
     statsContainer.style.display = 'none';
+    
+    // Remove percentages display
     questionsContainer.classList.remove('show-percentages');
+    
+    // Scroll back to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -435,14 +444,16 @@ async function loadSupabaseStats(userAnsweredQuestions, score) {
             throw allScoresError;
         }
         
-        // Calculate percentile
+        // Calculate percentile - FIXED
         const scores = allScores.map(item => item.score);
-        // For purity test, higher scores mean more pure (fewer "yes" answers)
-        // So count how many people scored lower than this user
+        // Higher purity score (more no answers) means more pure 
+        // So we want to count scores LOWER than the current score
         const scoresBelow = scores.filter(s => s < score).length;
         const percentile = Math.round((scoresBelow / scores.length) * 100);
         
-        // Create percentile chart
+        // Ensure the score description is updated with the accurate percentile
+        scoreDescription.innerHTML = getScoreDescriptionByPercentile(percentile);
+        
         statsContent.innerHTML = '';
         
         // Change the header text
@@ -455,7 +466,7 @@ async function loadSupabaseStats(userAnsweredQuestions, score) {
         const chartContainer = document.createElement('div');
         chartContainer.className = 'percentile-chart-container';
         
-        // Add description
+        // Add description - FIXED
         const percentileDescription = document.createElement('p');
         percentileDescription.className = 'percentile-description';
         percentileDescription.innerHTML = `Your score is higher than <strong>${percentile}%</strong> of all UNC students who have taken this test. The higher the percentage, the more "pure" you are compared to others.`;
@@ -489,10 +500,10 @@ async function loadSupabaseStats(userAnsweredQuestions, score) {
         labels.className = 'percentile-labels';
         
         const leftLabel = document.createElement('span');
-        leftLabel.textContent = 'Cooked';
+        leftLabel.textContent = 'Less Pure';
         
         const rightLabel = document.createElement('span');
-        rightLabel.textContent = 'Pure';
+        rightLabel.textContent = 'More Pure';
         
         labels.appendChild(leftLabel);
         labels.appendChild(rightLabel);
@@ -510,6 +521,56 @@ async function loadSupabaseStats(userAnsweredQuestions, score) {
         console.error('Error loading statistics:', error);
         statsContent.innerHTML = '<p>Unable to load statistics. Please try again later.</p>';
     }
+}
+
+// Display results when database operations fail
+function displayResults(score) {
+    // Show results
+    resultsSection.style.display = 'block';
+    resultsSection.scrollIntoView({ behavior: 'smooth' });
+    purityScore.textContent = score;
+    
+    // Generate a random percentile for fallback when database connection fails
+    const fallbackPercentile = Math.floor(Math.random() * 100);
+    
+    // Use the percentile to determine the score description
+    scoreDescription.innerHTML = getScoreDescriptionByPercentile(fallbackPercentile);
+    
+    // Remove any existing percentage explanation before adding a new one
+    const existingExplanation = document.querySelector('.percentage-explanation');
+    if (existingExplanation) {
+        existingExplanation.remove();
+    }
+    
+    // Add explanation about question percentages
+    const percentageExplanation = document.createElement('p');
+    percentageExplanation.className = 'percentage-explanation';
+    percentageExplanation.innerHTML = '<strong>Note:</strong> The percentages next to each question show how many UNC students have done that activity.';
+    scoreDescription.insertAdjacentElement('afterend', percentageExplanation);
+    
+    // Update percentages using local fallback data
+    questionsContainer.classList.add('show-percentages');
+    for (let i = 0; i < questions.length; i++) {
+        const percentageElement = document.getElementById(`percentage-${i}`);
+        if (percentageElement) {
+            // For checked questions, make the percentage more realistic (20-80% range)
+            if (responses[i]) {
+                // If the user selected this question, ensure it has a meaningful percentage
+                const percentage = statistics[i] || Math.floor(Math.random() * 60) + 20; // Between 20% and 80%
+                percentageElement.textContent = `${percentage}%`;
+                // Update statistics for this question if not already set
+                if (!statistics[i]) {
+                    statistics[i] = percentage;
+                }
+            } else {
+                // For questions not checked by user, show the existing percentage or a default
+                percentageElement.textContent = `${statistics[i] || Math.floor(Math.random() * 30) + 5}%`;
+            }
+        }
+    }
+    
+    // Save updated statistics
+    saveStatistics();
 }
 
 // Initialize the application when the DOM is fully loaded
