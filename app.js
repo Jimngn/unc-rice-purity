@@ -70,6 +70,14 @@ function renderQuestions() {
         label.appendChild(checkbox);
         label.appendChild(questionText);
         li.appendChild(label);
+        
+        // Add percentage element (initially hidden)
+        const percentageSpan = document.createElement('span');
+        percentageSpan.className = 'question-percentage';
+        percentageSpan.id = `percentage-${index}`;
+        percentageSpan.textContent = '0%';
+        li.appendChild(percentageSpan);
+        
         questionsContainer.appendChild(li);
     });
 }
@@ -251,8 +259,17 @@ async function calculateResults(e) {
     purityScore.textContent = score;
     scoreDescription.innerHTML = getScoreDescription(score);
     
-    // Load stats from Supabase
-    await loadSupabaseStats(userAnsweredQuestions);
+    // Update percentages for all questions
+    questionsContainer.classList.add('show-percentages');
+    for (let i = 0; i < questions.length; i++) {
+        const percentageElement = document.getElementById(`percentage-${i}`);
+        if (percentageElement) {
+            percentageElement.textContent = `${statistics[i] || 0}%`;
+        }
+    }
+    
+    // Load stats from Supabase and generate percentile chart
+    await loadSupabaseStats(userAnsweredQuestions, score);
 }
 
 // Reset the form
@@ -260,6 +277,7 @@ function resetForm() {
     responses = new Array(questions.length).fill(false);
     resultsSection.style.display = 'none';
     statsContainer.style.display = 'none';
+    questionsContainer.classList.remove('show-percentages');
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -267,15 +285,15 @@ function resetForm() {
 function toggleStats() {
     if (statsContainer.style.display === 'none') {
         statsContainer.style.display = 'block';
-        viewStatsButton.textContent = 'Hide Statistics';
+        viewStatsButton.textContent = 'Hide Percentile Chart';
     } else {
         statsContainer.style.display = 'none';
-        viewStatsButton.textContent = 'View Statistics';
+        viewStatsButton.textContent = 'View Percentile Chart';
     }
 }
 
 // Load statistics from Supabase
-async function loadSupabaseStats(userAnsweredQuestions) {
+async function loadSupabaseStats(userAnsweredQuestions, score) {
     statsContent.innerHTML = '<p>Loading statistics...</p>';
     
     try {
@@ -299,56 +317,84 @@ async function loadSupabaseStats(userAnsweredQuestions) {
             return;
         }
         
-        // 2. For each question the user answered yes to, get the stats
-        if (userAnsweredQuestions.length === 0) {
-            statsContent.innerHTML = '<p>You didn\'t answer "yes" to any questions!</p>';
-            return;
-        }
-        
-        // Get all responses to calculate percentages
-        const { data: responsesData, error: responsesError } = await window.supabaseClient
-            .from('question_responses')
-            .select('*')
-            .in('question_id', userAnsweredQuestions);
+        // Get all scores to calculate percentile
+        const { data: allScores, error: allScoresError } = await window.supabaseClient
+            .from('scores')
+            .select('score');
             
-        if (responsesError) {
-            console.error('Error loading responses:', responsesError);
-            throw responsesError;
+        if (allScoresError) {
+            console.error('Error loading all scores:', allScoresError);
+            throw allScoresError;
         }
         
-        if (!responsesData || responsesData.length === 0) {
-            statsContent.innerHTML = '<p>No statistics available for your selections yet.</p>';
-            return;
-        }
+        // Calculate percentile
+        const scores = allScores.map(item => item.score);
+        const scoresBelow = scores.filter(s => s < score).length;
+        const percentile = Math.round((scoresBelow / scores.length) * 100);
         
-        // Format and display stats
+        // Create percentile chart
         statsContent.innerHTML = '';
         
-        const formattedStats = responsesData.map(stat => ({
-            index: stat.question_id,
-            question: stat.question_text || questions[stat.question_id],
-            percentage: Math.round((stat.count / totalSubmissions) * 100),
-            count: stat.count
-        })).sort((a, b) => b.percentage - a.percentage);
+        // Change the header text
+        const statsHeader = document.querySelector('.stats-container h3');
+        if (statsHeader) {
+            statsHeader.textContent = 'Your Score Percentile';
+        }
         
-        formattedStats.slice(0, 10).forEach(stat => {
-            const statItem = document.createElement('div');
-            statItem.className = 'stat-item';
-            
-            const questionSpan = document.createElement('span');
-            questionSpan.className = 'stat-question';
-            questionSpan.textContent = stat.question;
-            
-            const percentageSpan = document.createElement('span');
-            percentageSpan.className = 'stat-percentage';
-            percentageSpan.textContent = `${stat.percentage}% (${stat.count})`;
-            
-            statItem.appendChild(questionSpan);
-            statItem.appendChild(percentageSpan);
-            statsContent.appendChild(statItem);
-        });
+        // Create the chart container
+        const chartContainer = document.createElement('div');
+        chartContainer.className = 'percentile-chart-container';
         
-        console.log('Statistics loaded successfully');
+        // Add description
+        const percentileDescription = document.createElement('p');
+        percentileDescription.innerHTML = `Your score is higher than <strong>${percentile}%</strong> of all UNC students who have taken this test.`;
+        chartContainer.appendChild(percentileDescription);
+        
+        // Create the chart
+        const chart = document.createElement('div');
+        chart.className = 'percentile-chart';
+        
+        // Create the bar
+        const bar = document.createElement('div');
+        bar.className = 'percentile-bar';
+        bar.style.width = '100%';
+        chart.appendChild(bar);
+        
+        // Create the marker
+        const marker = document.createElement('div');
+        marker.className = 'percentile-marker';
+        marker.style.left = `${percentile}%`;
+        chart.appendChild(marker);
+        
+        // Create the marker label
+        const markerLabel = document.createElement('div');
+        markerLabel.className = 'percentile-marker-label';
+        markerLabel.textContent = `You: ${score}`;
+        markerLabel.style.left = `${percentile}%`;
+        chart.appendChild(markerLabel);
+        
+        // Create the labels
+        const labels = document.createElement('div');
+        labels.className = 'percentile-labels';
+        
+        const leftLabel = document.createElement('span');
+        leftLabel.textContent = 'Less Pure';
+        
+        const rightLabel = document.createElement('span');
+        rightLabel.textContent = 'More Pure';
+        
+        labels.appendChild(leftLabel);
+        labels.appendChild(rightLabel);
+        
+        chartContainer.appendChild(chart);
+        chartContainer.appendChild(labels);
+        statsContent.appendChild(chartContainer);
+        
+        // Auto-display the stats section
+        statsContainer.style.display = 'block';
+        viewStatsButton.textContent = 'Hide Percentile Chart';
+        
+        console.log('Percentile chart created successfully');
     } catch (error) {
         console.error('Error loading statistics:', error);
         statsContent.innerHTML = '<p>Unable to load statistics. Please try again later.</p>';

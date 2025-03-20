@@ -86,6 +86,9 @@ ol {
 .question {
     margin-bottom: 0.5rem;
     padding: 0.3rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
 }
 
 .question:hover {
@@ -96,11 +99,27 @@ ol {
     display: flex;
     align-items: flex-start;
     cursor: pointer;
+    flex: 1;
 }
 
 .question input[type="checkbox"] {
     margin-right: 10px;
     margin-top: 5px;
+}
+
+.question-percentage {
+    color: var(--secondary-color);
+    font-weight: bold;
+    min-width: 60px;
+    text-align: right;
+    margin-left: 10px;
+    font-size: 0.9rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.show-percentages .question-percentage {
+    opacity: 1;
 }
 
 /* Buttons */
@@ -153,6 +172,53 @@ ol {
 .stats-container {
     margin-top: 1rem;
     text-align: left;
+}
+
+/* Percentile Chart */
+.percentile-chart {
+    width: 100%;
+    height: 60px;
+    background-color: #f5f5f5;
+    position: relative;
+    margin: 20px 0;
+    border-radius: 4px;
+}
+
+.percentile-bar {
+    height: 100%;
+    background: linear-gradient(to right, #13294B, #7BAFD4);
+    border-radius: 4px;
+}
+
+.percentile-marker {
+    position: absolute;
+    top: -25px;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 15px solid var(--primary-color);
+}
+
+.percentile-marker-label {
+    position: absolute;
+    top: -45px;
+    transform: translateX(-50%);
+    background-color: var(--primary-color);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.percentile-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+    font-size: 0.8rem;
+    color: var(--secondary-color);
 }
 
 .stat-item {
