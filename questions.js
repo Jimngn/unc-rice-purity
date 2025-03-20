@@ -31,7 +31,6 @@ const questions = [
     "Had a class that ended later than 7 PM?",
 
     // Campus Life
-    "Lived in a residence hall?",
     "Lived in Granville Towers?",
     "Lived on South Campus?",
     "Lived on North Campus?",
@@ -45,7 +44,7 @@ const questions = [
     "Missed the last P2P bus and had to walk back?",
     "Complained about the lack of parking on campus?",
     "Got a parking ticket?",
-    "Got more than 5 parking tickets?",
+    "Been towed from a campus parking spot?",
     "Posted on the UNC subreddit or Yik Yak?",
     "Been in a picture on the official UNC social media or Barstool?",
     "Worked out at the campus gym?",
@@ -54,7 +53,6 @@ const questions = [
     "Painted your face for a game?",
     "Rushed Franklin Street after beating Duke?",
     "Participated in the Pit Preacher debates?",
-    "Taken a picture at the Old Well on the first day of classes?",
     "Drank from the Old Well on the first day of classes for good luck?",
     "Taken a photo with Rameses?",
     "Done the Tar Heel chant?",
@@ -76,7 +74,7 @@ const questions = [
     "Attended a protest on campus?",
     "Soaked up booze at Cosmic Catina or Time Out?",
     "Went to Crumbl Cookies at 2 AM to use the free throw code?",
-    "Threw hands with Duke students?",
+    "Threw hands with Duke/State students?",
 
     // Relationships & Personal
     "Held hands romantically on campus?",
@@ -89,7 +87,7 @@ const questions = [
     "Hooked up with a frat brother to avoid getting kicked out of the party?",
     "Been in a relationship with another UNC student?",
     "Been in a relationship with a TA?",
-    "Been in a relationship with a professor?",
+    "Have been attracted romantically to a professor?",
     "Kicked a roommate out to commit a sexual act?",
     "Been walked in on while engaging in a sexual act?",
     "Had a pregnancy scare with another UNC student?",
@@ -110,10 +108,12 @@ const questions = [
     "Been questioned by campus police?",
     "Been handcuffed by campus police?",
     "Been arrested on or near campus?",
+    "Been to the UNC Hospital for an alcohol-related incident?",
     "Been sent to the Dean of Students for a disciplinary infraction?",
     "Been put on academic or disciplinary probation?",
     "Committed an act of vandalism on campus?",
     "Stolen something from campus (signs, equipment, etc.)?",
+    "Damaged property during Franklin Street celebrations?",
     "Broken into a campus building after hours?",
 ];
 
