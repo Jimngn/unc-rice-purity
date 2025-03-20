@@ -333,4 +333,15 @@ footer a {
     100% {
         left: 100%;
     }
+}
+
+/* Offline Notice */
+.offline-notice {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border-left: 4px solid #ffeeba;
+    margin: 10px 0;
+    font-size: 0.9rem;
 } 
