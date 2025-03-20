@@ -47,6 +47,7 @@ const questions = [
     "Got a parking ticket?",
     "Got more than 5 parking tickets?",
     "Posted on the UNC subreddit?",
+    "Been in a picture on the official UNC social media?",
     "Worked out at the campus gym?",
     "Participated in intramural sports?",
     "Attended a UNC sporting event?",
