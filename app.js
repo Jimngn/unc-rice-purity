@@ -15,6 +15,8 @@ const viewStatsButton = document.getElementById('viewStatsButton');
 const statsContainer = document.getElementById('statsContainer');
 const statsContent = document.getElementById('statsContent');
 const loadingContainer = document.getElementById('loadingContainer');
+const webShareButton = document.getElementById('webShareButton');
+const copyLinkButton = document.getElementById('copyLinkButton');
 
 // Application state
 let responses = new Array(questions.length).fill(false);
@@ -94,6 +96,10 @@ function attachEventListeners() {
     
     // View statistics button event
     viewStatsButton.addEventListener('click', toggleStats);
+    
+    // Share buttons events
+    if (webShareButton) webShareButton.addEventListener('click', shareViaWebAPI);
+    if (copyLinkButton) copyLinkButton.addEventListener('click', copyShareLink);
     
     // Track checkbox changes
     const checkboxes = document.querySelectorAll('input[type="checkbox"]');
@@ -206,6 +212,9 @@ async function calculateResults(e) {
         resultsSection.scrollIntoView({ behavior: 'smooth' });
         purityScore.textContent = score;
         
+        // Update share links with the user's score
+        updateShareLinks(score);
+        
         // Load existing statistics from Supabase
         console.log('Loading statistics from Supabase...');
         
@@ -304,6 +313,9 @@ async function calculateResults(e) {
         
         // Display results using local data as fallback
         displayResults(score);
+        
+        // Still update share links even in fallback mode
+        updateShareLinks(score);
     }
 }
 
@@ -566,10 +578,10 @@ async function loadSupabaseStats(userAnsweredQuestions, score) {
         labels.className = 'percentile-labels';
         
         const leftLabel = document.createElement('span');
-        leftLabel.textContent = 'Less Pure';
+        leftLabel.textContent = 'Cooked';
         
         const rightLabel = document.createElement('span');
-        rightLabel.textContent = 'More Pure';
+        rightLabel.textContent = 'Pure';
         
         labels.appendChild(leftLabel);
         labels.appendChild(rightLabel);
@@ -670,6 +682,93 @@ function displayResults(score) {
     
     // Save updated statistics
     saveStatistics();
+    
+    // Update share links with the user's score
+    updateShareLinks(score);
+}
+
+// Function to update social share links based on score
+function updateShareLinks(score) {
+    const pageUrl = encodeURIComponent(window.location.href);
+    const scoreMessage = encodeURIComponent(`I scored ${score} on the UNC Chapel Hill Purity Test! How pure are you? Take the test and find out!`);
+    
+}
+
+// Web Share API for modern browsers
+function shareViaWebAPI() {
+    const score = document.getElementById('purityScore').textContent;
+    const shareData = {
+        title: 'UNC Chapel Hill Purity Test',
+        text: `I scored ${score} on the UNC Chapel Hill Purity Test! How pure are you?`,
+        url: window.location.href
+    };
+    
+    if (navigator.share && navigator.canShare(shareData)) {
+        navigator.share(shareData)
+            .then(() => console.log('Shared successfully'))
+            .catch((error) => console.error('Error sharing:', error));
+    } else {
+        // Fallback if Web Share API is not supported
+        copyShareLink();
+        alert('Web sharing not supported on this browser. Link copied to clipboard instead!');
+    }
+}
+
+// Copy link to clipboard
+function copyShareLink() {
+    const score = document.getElementById('purityScore').textContent;
+    const shareText = `${window.location.href}`;
+    
+    try {
+        // Modern clipboard API
+        navigator.clipboard.writeText(shareText)
+            .then(() => {
+                // Visual feedback
+                const originalText = copyLinkButton.innerHTML;
+                copyLinkButton.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                
+                setTimeout(() => {
+                    copyLinkButton.innerHTML = originalText;
+                }, 2000);
+            })
+            .catch(err => {
+                console.error('Failed to copy: ', err);
+                fallbackCopyTextToClipboard(shareText);
+            });
+    } catch (err) {
+        // Fallback for older browsers
+        fallbackCopyTextToClipboard(shareText);
+    }
+}
+
+// Fallback copy method for older browsers
+function fallbackCopyTextToClipboard(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        const successful = document.execCommand('copy');
+        const msg = successful ? 'successful' : 'unsuccessful';
+        console.log('Fallback: Copying text command was ' + msg);
+        
+        // Visual feedback
+        const originalText = copyLinkButton.innerHTML;
+        copyLinkButton.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        
+        setTimeout(() => {
+            copyLinkButton.innerHTML = originalText;
+        }, 2000);
+    } catch (err) {
+        console.error('Fallback: Oops, unable to copy', err);
+    }
+    
+    document.body.removeChild(textArea);
 }
 
 // Initialize the application when the DOM is fully loaded

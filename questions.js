@@ -19,7 +19,7 @@ const questions = [
     "Cheated on an exam?",
     "Been caught cheating by a professor or TA?",
     "Skipped a class?",
-    "Skipped a whole class for the entire semester?",
+    "Skipped a whole class for the entire semester except for midterms and finals?",
     "Attended less than 5 lectures through a term?",
     "Had to carry a group project?",
     "Been the one carried in a group project?",
@@ -119,20 +119,14 @@ const questions = [
 
 // Score ranges and descriptions for interpreting results
 const scoreRanges = [
-    { min: 0, max: 20, title: "Carolina Legend", description: "Your liver deserves a separate diploma. You've experienced everything Chapel Hill has to offer and might have invented a few new traditions along the way." },
-    { min: 21, max: 40, title: "Ram Rampager", description: "You've mastered the art of balancing hangovers with homework. Your parents would be equally proud and horrified." },
-    { min: 41, max: 60, title: "Red Cup Collector", description: "You've dabbled in the Carolina experience but still have a few unexplored corners of campus. Your liver functions at approximately 75% capacity." },
-    { min: 61, max: 80, title: "Library Dweller", description: "You've heard rumors of this thing called 'fun' but can't find it in the course catalog. Your GPA is inversely proportional to your social life." },
-    { min: 81, max: 100, title: "Franklin Street Virgin", description: "You think Top of the Hill is just a geographical location. Your dorm room has seen more of you than the entire campus combined." }
+    { min: 0, max: 20, title: "Carolina Legend", description: "Your liver deserves a separate diploma." },
+    { min: 21, max: 40, title: "Ram Rampager", description: "You've mastered the art of balancing hangovers with homework." },
+    { min: 41, max: 60, title: "Red Cup Collector", description: "You've enjoyed the scene but haven't seen it all." },
+    { min: 61, max: 80, title: "Davis Dweller", description: "You've heard rumors of this thing called 'fun' but can't find it in the course catalog." },
+    { min: 81, max: 100, title: "Franklin Street Virgin", description: "You think Top of the Hill is just a geographical location" }
 ];
 
-// Initial fake statistics data (will be replaced with real data as users take the test)
 const initialStatistics = {};
-
-// Initialize each question with a random percentage between 20% and 70%
-questions.forEach((question, index) => {
-    initialStatistics[index] = Math.floor(Math.random() * 50) + 20; // Random number between 20 and 70
-});
 
 // Export the data so it can be used in app.js
 if (typeof module !== 'undefined' && module.exports) {
