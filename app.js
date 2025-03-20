@@ -287,6 +287,12 @@ async function calculateResults(e) {
         purityScore.textContent = score;
         scoreDescription.innerHTML = getScoreDescription(score);
         
+        // Remove any existing percentage explanation before adding a new one
+        const existingExplanation = document.querySelector('.percentage-explanation');
+        if (existingExplanation) {
+            existingExplanation.remove();
+        }
+        
         // Add explanation about question percentages
         const percentageExplanation = document.createElement('p');
         percentageExplanation.className = 'percentage-explanation';
@@ -332,6 +338,12 @@ async function calculateResults(e) {
         resultsSection.scrollIntoView({ behavior: 'smooth' });
         purityScore.textContent = score;
         scoreDescription.innerHTML = getScoreDescription(score);
+        
+        // Remove any existing percentage explanation before adding a new one
+        const existingExplanation = document.querySelector('.percentage-explanation');
+        if (existingExplanation) {
+            existingExplanation.remove();
+        }
         
         // Add explanation about question percentages
         const percentageExplanation = document.createElement('p');
@@ -425,8 +437,9 @@ async function loadSupabaseStats(userAnsweredQuestions, score) {
         
         // Calculate percentile
         const scores = allScores.map(item => item.score);
-        // Reverse the percentile calculation logic - higher scores are better (more pure)
-        const scoresBelow = scores.filter(s => s > score).length;
+        // For purity test, higher scores mean more pure (fewer "yes" answers)
+        // So count how many people scored lower than this user
+        const scoresBelow = scores.filter(s => s < score).length;
         const percentile = Math.round((scoresBelow / scores.length) * 100);
         
         // Create percentile chart
