@@ -119,9 +119,9 @@ const questions = [
 
 // Score ranges and descriptions for interpreting results
 const scoreRanges = [
-    { min: 0, max: 20, title: "Carolina Legend", description: "Your liver deserves a separate diploma." },
-    { min: 21, max: 40, title: "Ram Rampager", description: "You've mastered the art of balancing hangovers with homework." },
-    { min: 41, max: 60, title: "Red Cup Collector", description: "You've enjoyed the scene but haven't seen it all." },
+    { min: 0, max: 10, title: "Carolina Legend", description: "Your liver deserves a separate diploma." },
+    { min: 11, max: 35, title: "Ram Rampager", description: "You've mastered the art of balancing hangovers with homework." },
+    { min: 36, max: 60, title: "Red Cup Collector", description: "You've enjoyed the scene but haven't seen it all." },
     { min: 61, max: 80, title: "Davis Dweller", description: "You've heard rumors of this thing called 'fun' but can't find it in the course catalog." },
     { min: 81, max: 100, title: "Franklin Street Virgin", description: "You think Top of the Hill is just a geographical location" }
 ];
